@@ -4,14 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Seatify ✦ 新海誠風班級智慧座位表產生器</title>
-  <!-- Google Fonts: 日系圓體與微軟正黑體相容 -->
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      /* 新海誠色調：蔚藍天際、陽光金黃、櫻花粉嫩、深海藍 */
+      /* 新海誠色調：蔚藍天際、陽光金黃、櫻花粉嫩 */
       --sky-blue: #0284c7;
       --sky-light: #e0f2fe;
       --sky-vivid: #38bdf8;
@@ -19,10 +19,7 @@
       --sakura-light: #fce7f3;
       --sun-gold: #f59e0b;
       --sun-light: #fef3c7;
-      --grass-green: #10b981;
-      --cloud-white: #ffffff;
       --text-dark: #0f172a;
-      --text-sub: #475569;
       --border-color: #bae6fd;
       --card-shadow: 0 10px 25px -5px rgba(56, 189, 248, 0.25), 0 8px 10px -6px rgba(251, 113, 133, 0.15);
     }
@@ -43,7 +40,7 @@
       position: relative;
     }
 
-    /* 裝飾性日系白雲 background light accents */
+    /* 裝飾性背景 */
     body::before {
       content: "";
       position: fixed;
@@ -231,15 +228,23 @@
       font-size: 2rem;
       font-weight: 900;
       color: var(--sky-blue);
-      margin-bottom: 20px;
+      margin-bottom: 24px;
       letter-spacing: 2px;
       text-shadow: 1px 1px 0 #38bdf8;
     }
 
-    /* 講台 / 黑板 (日系清新深翠綠黑板) */
+    /* 格子 Grid */
+    .grid-container {
+      display: grid;
+      gap: 16px;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+
+    /* 講台 / 黑板 (置於下方) */
     .podium {
       width: 65%;
-      margin: 0 auto 32px auto;
+      margin: 0 auto 20px auto;
       padding: 14px 20px;
       background: linear-gradient(135deg, #064e3b 0%, #047857 100%);
       color: #ecfdf5;
@@ -249,19 +254,10 @@
       border-radius: 12px;
       border: 4px solid #a7f3d0;
       box-shadow: 0 6px 16px rgba(4, 120, 87, 0.25);
-      position: relative;
     }
 
     .podium::before {
       content: "✦ 講 台 / 黑 板 ✦";
-    }
-
-    /* 格子 Grid */
-    .grid-container {
-      display: grid;
-      gap: 16px;
-      justify-content: center;
-      margin-top: 10px;
     }
 
     /* 座位卡片 */
@@ -350,7 +346,7 @@
     }
 
     .tip-banner {
-      margin-top: 24px;
+      margin-top: 10px;
       padding: 12px 20px;
       background: rgba(224, 242, 254, 0.8);
       border-radius: 12px;
@@ -398,7 +394,12 @@
         font-size: 2.2rem !important;
         color: #000 !important;
         text-shadow: none !important;
-        margin-bottom: 12px !important;
+        margin-bottom: 16px !important;
+      }
+
+      .grid-container {
+        gap: 10px !important;
+        margin-bottom: 16px !important;
       }
 
       .podium {
@@ -407,12 +408,8 @@
         border: 2px solid #000 !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
-        margin-bottom: 20px !important;
         padding: 8px !important;
-      }
-
-      .grid-container {
-        gap: 10px !important;
+        margin-top: 10px !important;
       }
 
       .seat-card {
@@ -456,20 +453,15 @@
     <!-- 頁頭 Logo & 標題 -->
     <header>
       <div class="logo-box">
-        <!-- 可愛的動漫風格雲朵貓貓 SVG Logo -->
         <svg width="48" height="48" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M18 44C12 44 8 39 8 33C8 27.5 12 23 17 22.2C18.5 15 24.5 10 32 10C40 10 46.5 15.5 47.8 23C52.5 24 56 28 56 33C56 39 51.5 44 45 44H18Z" fill="#38BDF8"/>
-          <!-- 貓耳 -->
           <path d="M22 18L15 8L26 13Z" fill="#FB7185"/>
           <path d="M42 18L49 8L38 13Z" fill="#FB7185"/>
-          <!-- 臉部眼睛 & 腮紅 -->
           <circle cx="25" cy="28" r="3" fill="#0F172A"/>
           <circle cx="39" cy="28" r="3" fill="#0F172A"/>
           <ellipse cx="20" cy="32" rx="3" ry="1.8" fill="#FDA4AF"/>
           <ellipse cx="44" cy="32" rx="3" ry="1.8" fill="#FDA4AF"/>
-          <!-- 嘴巴 -->
           <path d="M30 31Q32 34 34 31" stroke="#0F172A" stroke-width="2" stroke-linecap="round" fill="none"/>
-          <!-- 閃亮星星 -->
           <path d="M52 14L53.5 17.5L57 19L53.5 20.5L52 24L50.5 20.5L47 19L50.5 17.5Z" fill="#F59E0B"/>
         </svg>
       </div>
@@ -514,15 +506,15 @@
     <!-- 座位展示區 -->
     <div class="seating-area">
       <div class="class-title-display" id="displayTitle">115班 座位表</div>
-      
-      <!-- 講台標示 -->
-      <div class="podium"></div>
 
       <!-- 座位 Grid -->
       <div class="grid-container" id="gridContainer"></div>
 
+      <!-- 講台標示 (放置於座位區下方) -->
+      <div class="podium"></div>
+
       <div class="tip-banner">
-        ✨ <b>使用小撇步：</b>抽籤後可按住座位卡片<b>拖曳對調</b>；點擊右上角 📌 圖示可<b>固定/鎖定座位</b>（亂數抽籤時該位置將不受影響）。
+        ✨ <b>使用小撇步：</b>講台位於下方，第一排緊鄰講台。抽籤後可按住座位卡片<b>拖曳對調</b>；點擊右上角 📌 圖示可<b>固定/鎖定座位</b>。
       </div>
     </div>
   </div>
@@ -552,10 +544,8 @@
       studentList = [];
 
       if (manualText) {
-        // 優先從手動文字區讀取
         parseTextList(manualText);
       } else if (url) {
-        // 從 Google 試算表線上讀取
         try {
           const csvUrl = getCsvUrl(url);
           const response = await fetch(csvUrl);
@@ -599,7 +589,6 @@
         if (!cleanLine) return;
 
         const cols = cleanLine.split(',');
-        // 跳過標題列
         if (cols[0].includes('座號') || cols[0].includes('姓名') || cols[0].includes('Name')) return;
 
         if (cols.length >= 2 && !isNaN(cols[0].trim())) {
@@ -633,8 +622,10 @@
       renderGrid();
     }
 
-    // 渲染 UI 網格
+    // 渲染 UI 網格 (將第一排渲染在靠近講台的下方)
     function renderGrid() {
+      const rows = parseInt(document.getElementById('rows').value) || 5;
+      const cols = parseInt(document.getElementById('cols').value) || 6;
       const grid = document.getElementById('gridContainer');
       grid.innerHTML = '';
 
@@ -643,6 +634,12 @@
         card.className = `seat-card ${seat.locked ? 'locked' : ''} ${!seat.student ? 'empty' : ''}`;
         card.draggable = true;
         card.dataset.index = index;
+
+        // 計算 CSS Grid 逆向行號 (讓 1~6 號位於最底下、靠近講台)
+        const rowIndex = Math.floor(index / cols); // 0 代表第一排
+        const colIndex = (index % cols) + 1;
+        card.style.gridRow = rows - rowIndex; // 倒轉放置
+        card.style.gridColumn = colIndex;
 
         // 座號標示
         const seatNum = document.createElement('span');
@@ -699,7 +696,6 @@
         return;
       }
 
-      // 取得所有未鎖定位置上的學生
       let unlockedStudents = [];
       seatData.forEach(seat => {
         if (!seat.locked && seat.student) {
@@ -707,13 +703,11 @@
         }
       });
 
-      // 洗牌
       for (let i = unlockedStudents.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [unlockedStudents[i], unlockedStudents[j]] = [unlockedStudents[j], unlockedStudents[i]];
       }
 
-      // 填回非鎖定座位
       let studentIdx = 0;
       seatData.forEach(seat => {
         if (!seat.locked) {
@@ -746,7 +740,6 @@
       const targetIndex = parseInt(this.dataset.index);
 
       if (draggedIndex !== null && draggedIndex !== targetIndex) {
-        // 交換兩座位上的學生
         const temp = seatData[draggedIndex].student;
         seatData[draggedIndex].student = seatData[targetIndex].student;
         seatData[targetIndex].student = temp;
@@ -766,4 +759,3 @@
   </script>
 </body>
 </html>
-```eofs
