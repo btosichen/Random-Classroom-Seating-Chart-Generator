@@ -132,6 +132,13 @@
       gap: 6px;
     }
 
+    .input-help {
+      font-size: 0.8rem;
+      font-weight: 700;
+      line-height: 1.5;
+      color: #475569;
+    }
+
     input[type="text"], input[type="url"], input[type="number"], textarea {
       padding: 12px 14px;
       border: 2px solid #bae6fd;
@@ -475,12 +482,14 @@
     <div class="control-panel">
       <div class="input-group">
         <label for="classTitle">🌸 班級名稱 / 活動標題</label>
-        <input type="text" id="classTitle" value="115班 座位表" placeholder="例如：115班 座位表">
+        <span class="input-help" id="classTitleHelp">輸入的文字會顯示在座位表上方；留白時將顯示「班級座位表」。</span>
+        <input type="text" id="classTitle" value="115班 座位表" placeholder="例如：115班 座位表" aria-describedby="classTitleHelp">
       </div>
 
       <div class="input-group">
         <label for="sheetUrl">🔗 Google 試算表連結 (公開檢視)</label>
-        <input type="url" id="sheetUrl" placeholder="貼上 Google 試算表網址" value="https://docs.google.com/spreadsheets/d/11AzaC6tk9bDrRRtv31kS72lIPodPE_G_/edit?usp=sharing">
+        <span class="input-help" id="sheetUrlHelp">請先將共用權限設為「知道連結的任何人皆可檢視」，並依序在 A 欄填座號、B 欄填姓名。</span>
+        <input type="url" id="sheetUrl" placeholder="貼上公開檢視的 Google 試算表網址" aria-describedby="sheetUrlHelp">
       </div>
 
       <div class="input-group">
