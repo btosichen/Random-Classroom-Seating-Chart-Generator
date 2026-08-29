@@ -363,6 +363,16 @@
       display: inline-block;
     }
 
+    .site-footer {
+      margin-top: 24px;
+      padding: 12px 16px;
+      color: #0369a1;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.6;
+    }
+
     /* 🖨️ A4 橫式列印專用樣式 (@media print) */
     @media print {
       @page {
@@ -451,6 +461,14 @@
       .student-name {
         color: #000000 !important;
       }
+
+      .site-footer {
+        margin-top: 10px !important;
+        padding: 0 !important;
+        color: #475569 !important;
+        font-size: 0.7rem !important;
+        break-inside: avoid;
+      }
     }
   </style>
 </head>
@@ -526,6 +544,10 @@
         ✨ <b>使用小撇步：</b>講台位於下方，第一排緊鄰講台。抽籤後可按住座位卡片<b>拖曳對調</b>；點擊右上角 📌 圖示可<b>固定/鎖定座位</b>。
       </div>
     </div>
+
+    <footer class="site-footer">
+      臺北市立陽明高中國中部｜資訊科技科｜陳政川老師設計
+    </footer>
   </div>
 
   <script>
