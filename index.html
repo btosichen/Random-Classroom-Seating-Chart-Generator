@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>班級智慧座位表產生器</title>
+  <style>
+    :root {
+      --primary-color: #3b82f6;
+      --primary-dark: #1d4ed8;
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --text-color: #1e293b;
+      --border-color: #cbd5e1;
+      --locked-bg: #fef3c7;
+      --locked-border: #f59e0b;
+      --empty-bg: #f1f5f9;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      color: #0f172a;
+      margin-bottom: 8px;
+    }
+
+    /* 控制面板樣式 */
+    .control-panel {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      margin-bottom: 24px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .input-group label {
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: #475569;
+    }
+
+    input, select, textarea, button {
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 0.95rem;
+    }
+
+    input:focus, textarea:focus {
+      outline: 2px solid var(--primary-color);
+      border-color: transparent;
+    }
+
+    .row-col-inputs {
+      display: flex;
+      gap: 10px;
+    }
+
+    .row-col-inputs input {
+      width: 100%;
+    }
+
+    .btn-group {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+      flex: 1;
+      min-width: 120px;
+    }
+
+    button:hover {
+      background-color: var(--primary-dark);
+    }
+
+    button.secondary {
+      background-color: #64748b;
+    }
+    button.secondary:hover {
+      background-color: #475569;
+    }
+
+    button.success {
+      background-color: #10b981;
+    }
+    button.success:hover {
+      background-color: #059669;
+    }
+
+    /* 座位表預覽區域 */
+    .seating-area {
+      background: var(--card-bg);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .class-title-display {
+      font-size: 1.6rem;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    .podium {
+      width: 60%;
+      margin: 0 auto 25px auto;
+      padding: 10px;
+      background-color: #334155;
+      color: white;
+      font-weight: bold;
+      letter-spacing: 4px;
+      border-radius: 6px;
+    }
+
+    .grid-container {
+      display: grid;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .seat-card {
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px 8px;
+      min-height: 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: #ffffff;
+      cursor: grab;
+      user-select: none;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .seat-card:active {
+      cursor: grabbing;
+    }
+
+    .seat-card.drag-over {
+      border-color: var(--primary-color);
+      background-color: #eff6ff;
+      transform: scale(1.03);
+    }
+
+    .seat-card.locked {
+      background-color: var(--locked-bg);
+      border-color: var(--locked-border);
+    }
+
+    .seat-card.empty {
+      background-color: var(--empty-bg);
+      color: #94a3b8;
+      border-style: dashed;
+    }
+
+    .seat-num {
+      font-size: 0.75rem;
+      color: #64748b;
+      position: absolute;
+      top: 4px;
+      left: 6px;
+    }
+
+    .lock-btn {
+      position: absolute;
+      top: 4px;
+      right: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      opacity: 0.5;
+    }
+
+    .lock-btn:hover {
+      opacity: 1;
+    }
+
+    .student-id {
+      font-size: 0.8rem;
+      color: #64748b;
+    }
+
+    .student-name {
+      font-size: 1.1rem;
+      font-weight: bold;
+      margin-top: 4px;
+    }
+
+    .tip-text {
+      margin-top: 15px;
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+
+    /* 列印專用樣式 (@media print) */
+    @media print {
+      body {
+        background-color: white;
+        padding: 0;
+      }
+
+      .control-panel, .tip-text, header h1, .no-print {
+        display: none !important;
+      }
+
+      .seating-area {
+        box-shadow: none;
+        padding: 0;
+        width: 100%;
+      }
+
+      .podium {
+        background-color: #000;
+        color: #fff;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .seat-card {
+        border: 1px solid #000 !important;
+        break-inside: avoid;
+      }
+
+      .seat-card.locked {
+        background-color: #fff !important;
+      }
+
+      .lock-btn {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>🏫 班級智慧座位表產生器</h1>
+    </header>
+
+    <div class="control-panel">
+      <div class="input-group">
+        <label for="classTitle">班級名稱 / 活動標題</label>
+        <input type="text" id="classTitle" value="115班 座位表" placeholder="例：115班 座位表">
+      </div>
+
+      <div class="input-group">
+        <label for="sheetUrl">Google 試算表連結 (共享改為公開檢視)</label>
+        <input type="url" id="sheetUrl" placeholder="貼上 Google 試算表連結" value="https://docs.google.com/spreadsheets/d/11AzaC6tk9bDrRRtv31kS72lIPodPE_G_/edit?usp=sharing">
+      </div>
+
+      <div class="input-group">
+        <label>座位排數與列數 (行 × 列)</label>
+        <div class="row-col-inputs">
+          <input type="number" id="rows" value="5" min="1" max="10" placeholder="行數 (直)">
+          <input type="number" id="cols" value="6" min="1" max="10" placeholder="列數 (橫)">
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="manualInput">或直接貼上學生名單 (每行名字或「座號 姓名」)</label>
+        <textarea id="manualInput" rows="2" placeholder="例：&#10;1 陳大明&#10;2 林小美"></textarea>
+      </div>
+
+      <div class="btn-group">
+        <button onclick="loadStudents()">1. 載入學生名單</button>
+        <button class="success" onclick="shuffleSeats()">2. 亂數抽籤排列</button>
+        <button class="secondary" onclick="window.print()">3. 🖨️ 列印座位表</button>
+      </div>
+    </div>
+
+    <div class="seating-area">
+      <div class="class-title-display" id="displayTitle">115班 座位表</div>
+      
+      <div class="podium">黑 板 / 講 台</div>
+
+      <div class="grid-container" id="gridContainer"></div>
+
+      <p class="tip-text">💡 提示：亂數排好後，可用滑鼠<b>拖曳座位</b>互相對調；點擊座位右上角的 📌 可以<b>鎖定座位</b>（亂數排列時將保持不變）。</p>
+    </div>
+  </div>
+
+  <script>
+    let studentList = [];
+    let seatData = []; // 紀錄每個座位的狀態 { student: null/obj, locked: boolean }
+    let draggedIndex = null;
+
+    // 從 Google Sheet 網址提取 CSV 下載網址
+    function getCsvUrl(url) {
+      const match = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
+      if (match && match[1]) {
+        return `https://docs.google.com/spreadsheets/d/${match[1]}/gviz/tq?tqx=out:csv`;
+      }
+      return url;
+    }
+
+    // 載入名單
+    async function loadStudents() {
+      const titleInput = document.getElementById('classTitle').value;
+      document.getElementById('displayTitle').innerText = titleInput || "班級座位表";
+
+      const url = document.getElementById('sheetUrl').value.trim();
+      const manualText = document.getElementById('manualInput').value.trim();
+
+      studentList = [];
+
+      if (manualText) {
+        // 從手動輸入框讀取
+        parseTextList(manualText);
+      } else if (url) {
+        // 從 Google Sheet 讀取
+        try {
+          const csvUrl = getCsvUrl(url);
+          const response = await fetch(csvUrl);
+          if (!response.ok) throw new Error("無法讀取 Google 試算表，請確認權限已設為「知道連結的人皆可檢視」");
+          const csvText = await response.text();
+          parseCsvData(csvText);
+        } catch (err) {
+          alert("載入失敗: " + err.message);
+          return;
+        }
+      } else {
+        alert("請輸入 Google 試算表網址或在下方文字框貼上學生名單！");
+        return;
+      }
+
+      initGrid();
+      alert(`成功載入 ${studentList.length} 位學生名單！`);
+    }
+
+    // 解析文字名單
+    function parseTextList(text) {
+      const lines = text.split('\n');
+      lines.forEach((line, index) => {
+        const trimmed = line.trim();
+        if (trimmed) {
+          const parts = trimmed.split(/\s+/);
+          if (parts.length > 1 && !isNaN(parts[0])) {
+            studentList.push({ id: parts[0], name: parts.slice(1).join(' ') });
+          } else {
+            studentList.push({ id: index + 1, name: trimmed });
+          }
+        }
+      });
+    }
+
+    // 解析 CSV 名單
+    function parseCsvData(csvText) {
+      const lines = csvText.split('\n');
+      lines.forEach((line, index) => {
+        // 簡單清除非必要字元
+        const cleanLine = line.replace(/"/g, '').trim();
+        if (!cleanLine) return;
+
+        const cols = cleanLine.split(',');
+        // 跳過表頭 (如包含 座號, 姓名 等字眼)
+        if (cols[0].includes('座號') || cols[0].includes('姓名') || cols[0].includes('Name')) return;
+
+        if (cols.length >= 2 && !isNaN(cols[0])) {
+          studentList.push({ id: cols[0].trim(), name: cols[1].trim() });
+        } else if (cols.length >= 1 && cols[0].trim()) {
+          studentList.push({ id: studentList.length + 1, name: cols[0].trim() });
+        }
+      });
+    }
+
+    // 初始化網格
+    function initGrid() {
+      const rows = parseInt(document.getElementById('rows').value) || 5;
+      const cols = parseInt(document.getElementById('cols').value) || 6;
+      const totalSeats = rows * cols;
+
+      const grid = document.getElementById('gridContainer');
+      grid.style.gridTemplateColumns = `repeat(${cols}, 120px)`;
+
+      // 保留原本鎖定的狀態，若沒有則創建新陣列
+      const newSeatData = [];
+      for (let i = 0; i < totalSeats; i++) {
+        const student = studentList[i] || null;
+        const isLocked = seatData[i] ? seatData[i].locked : false;
+        newSeatData.push({
+          student: student,
+          locked: isLocked
+        });
+      }
+      seatData = newSeatData;
+      renderGrid();
+    }
+
+    // 渲染網格 UI
+    function renderGrid() {
+      const grid = document.getElementById('gridContainer');
+      grid.innerHTML = '';
+
+      seatData.forEach((seat, index) => {
+        const card = document.createElement('div');
+        card.className = `seat-card ${seat.locked ? 'locked' : ''} ${!seat.student ? 'empty' : ''}`;
+        card.draggable = true;
+        card.dataset.index = index;
+
+        // 座號標示 (位置編號)
+        const seatNum = document.createElement('span');
+        seatNum.className = 'seat-num';
+        seatNum.innerText = index + 1;
+
+        // 鎖定按鈕
+        const lockBtn = document.createElement('span');
+        lockBtn.className = 'lock-btn';
+        lockBtn.innerHTML = seat.locked ? '🔒' : '📌';
+        lockBtn.title = seat.locked ? '點擊解鎖' : '點擊鎖定座位';
+        lockBtn.onclick = (e) => {
+          e.stopPropagation();
+          seatData[index].locked = !seatData[index].locked;
+          renderGrid();
+        };
+
+        card.appendChild(seatNum);
+        card.appendChild(lockBtn);
+
+        if (seat.student) {
+          const idElem = document.createElement('div');
+          idElem.className = 'student-id';
+          idElem.innerText = `(${seat.student.id}號)`;
+
+          const nameElem = document.createElement('div');
+          nameElem.className = 'student-name';
+          nameElem.innerText = seat.student.name;
+
+          card.appendChild(idElem);
+          card.appendChild(nameElem);
+        } else {
+          const emptyElem = document.createElement('div');
+          emptyElem.className = 'student-name';
+          emptyElem.innerText = '空位';
+          card.appendChild(emptyElem);
+        }
+
+        // 拖曳事件綁定
+        card.addEventListener('dragstart', handleDragStart);
+        card.addEventListener('dragover', handleDragOver);
+        card.addEventListener('dragleave', handleDragLeave);
+        card.addEventListener('drop', handleDrop);
+
+        grid.appendChild(card);
+      });
+    }
+
+    // 亂數排列（洗牌演算法）
+    function shuffleSeats() {
+      if (seatData.length === 0) {
+        alert("請先載入學生名單！");
+        return;
+      }
+
+      // 提取未鎖定座位上的學生名單
+      let unlockedStudents = [];
+      seatData.forEach(seat => {
+        if (!seat.locked && seat.student) {
+          unlockedStudents.push(seat.student);
+        }
+      });
+
+      // 若未鎖定座位中有空的，也將剩餘學生補助進去
+      if (unlockedStudents.length === 0 && studentList.length > 0) {
+        unlockedStudents = [...studentList];
+      }
+
+      // Fisher-Yates 隨機洗牌
+      for (let i = unlockedStudents.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [unlockedStudents[i], unlockedStudents[j]] = [unlockedStudents[j], unlockedStudents[i]];
+      }
+
+      // 填回未鎖定的座位
+      let studentIdx = 0;
+      seatData.forEach(seat => {
+        if (!seat.locked) {
+          seat.student = unlockedStudents[studentIdx] || null;
+          studentIdx++;
+        }
+      });
+
+      renderGrid();
+    }
+
+    // 拖曳對調邏輯
+    function handleDragStart(e) {
+      draggedIndex = parseInt(this.dataset.index);
+      e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      this.classList.add('drag-over');
+    }
+
+    function handleDragLeave() {
+      this.classList.remove('drag-over');
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      this.classList.remove('drag-over');
+      const targetIndex = parseInt(this.dataset.index);
+
+      if (draggedIndex !== null && draggedIndex !== targetIndex) {
+        // 對調兩個座位的學生
+        const temp = seatData[draggedIndex].student;
+        seatData[draggedIndex].student = seatData[targetIndex].student;
+        seatData[targetIndex].student = temp;
+
+        renderGrid();
+      }
+    }
+
+    // 當行列改變時自動更新網格
+    document.getElementById('rows').addEventListener('change', initGrid);
+    document.getElementById('cols').addEventListener('change', initGrid);
+  </script>
+</body>
+</html>
