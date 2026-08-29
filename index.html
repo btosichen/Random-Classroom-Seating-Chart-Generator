@@ -3,178 +3,289 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>班級智慧座位表產生器</title>
+  <title>Seatify ✦ 新海誠風班級智慧座位表產生器</title>
+  <!-- Google Fonts: 日系圓體與微軟正黑體相容 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
+
   <style>
     :root {
-      --primary-color: #3b82f6;
-      --primary-dark: #1d4ed8;
-      --bg-color: #f8fafc;
-      --card-bg: #ffffff;
-      --text-color: #1e293b;
-      --border-color: #cbd5e1;
-      --locked-bg: #fef3c7;
-      --locked-border: #f59e0b;
-      --empty-bg: #f1f5f9;
+      /* 新海誠色調：蔚藍天際、陽光金黃、櫻花粉嫩、深海藍 */
+      --sky-blue: #0284c7;
+      --sky-light: #e0f2fe;
+      --sky-vivid: #38bdf8;
+      --sakura-pink: #fb7185;
+      --sakura-light: #fce7f3;
+      --sun-gold: #f59e0b;
+      --sun-light: #fef3c7;
+      --grass-green: #10b981;
+      --cloud-white: #ffffff;
+      --text-dark: #0f172a;
+      --text-sub: #475569;
+      --border-color: #bae6fd;
+      --card-shadow: 0 10px 25px -5px rgba(56, 189, 248, 0.25), 0 8px 10px -6px rgba(251, 113, 133, 0.15);
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+      font-family: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
     }
 
     body {
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      padding: 20px;
+      background: linear-gradient(135deg, #e0f2fe 0%, #fce7f3 50%, #fef3c7 100%);
+      background-attachment: fixed;
+      color: var(--text-dark);
+      min-height: 100vh;
+      padding: 24px 16px;
+      position: relative;
+    }
+
+    /* 裝飾性日系白雲 background light accents */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: 
+        radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.8) 0%, transparent 20%),
+        radial-gradient(circle at 85% 15%, rgba(255, 255, 255, 0.7) 0%, transparent 25%),
+        radial-gradient(circle at 50% 80%, rgba(255, 255, 255, 0.6) 0%, transparent 30%);
+      pointer-events: none;
+      z-index: 0;
     }
 
     .container {
-      max-width: 1200px;
+      max-width: 1280px;
       margin: 0 auto;
+      position: relative;
+      z-index: 1;
     }
 
+    /* Header 區域 & Logo */
     header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    h1 {
-      font-size: 1.8rem;
-      color: #0f172a;
-      margin-bottom: 8px;
-    }
-
-    /* 控制面板樣式 */
-    .control-panel {
-      background: var(--card-bg);
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      margin-bottom: 24px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      display: flex;
+      align-items: center;
+      justify-content: center;
       gap: 16px;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .logo-box {
+      background: white;
+      padding: 10px;
+      border-radius: 50%;
+      box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+      border: 3px solid #7dd3fc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: floatLogo 3s ease-in-out infinite;
+    }
+
+    @keyframes floatLogo {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-6px) rotate(3deg); }
+    }
+
+    .header-text h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--sky-blue);
+      text-shadow: 2px 2px 0px #ffffff, 4px 4px 0px rgba(56, 189, 248, 0.2);
+      letter-spacing: 1px;
+    }
+
+    .header-text p {
+      font-size: 0.95rem;
+      color: #0369a1;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    /* 控制面板 Panel */
+    .control-panel {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 24px;
+      border-radius: 20px;
+      border: 3px solid #ffffff;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 28px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
     }
 
     .input-group {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 8px;
     }
 
     .input-group label {
-      font-size: 0.9rem;
-      font-weight: bold;
-      color: #475569;
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #0284c7;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    input, select, textarea, button {
-      padding: 10px;
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
+    input[type="text"], input[type="url"], input[type="number"], textarea {
+      padding: 12px 14px;
+      border: 2px solid #bae6fd;
+      border-radius: 12px;
       font-size: 0.95rem;
+      font-weight: 700;
+      background: #f0f9ff;
+      color: var(--text-dark);
+      transition: all 0.25s ease;
     }
 
     input:focus, textarea:focus {
-      outline: 2px solid var(--primary-color);
-      border-color: transparent;
+      outline: none;
+      border-color: var(--sakura-pink);
+      background: #ffffff;
+      box-shadow: 0 0 0 4px rgba(251, 113, 133, 0.2);
     }
 
     .row-col-inputs {
       display: flex;
-      gap: 10px;
+      gap: 12px;
     }
 
     .row-col-inputs input {
       width: 100%;
+      text-align: center;
     }
 
+    /* 按鈕樣式 */
     .btn-group {
       grid-column: 1 / -1;
       display: flex;
-      gap: 10px;
+      gap: 14px;
       flex-wrap: wrap;
-      margin-top: 10px;
+      margin-top: 8px;
     }
 
     button {
-      background-color: var(--primary-color);
-      color: white;
+      padding: 14px 20px;
       border: none;
-      font-weight: bold;
+      border-radius: 14px;
+      font-size: 1rem;
+      font-weight: 800;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
       flex: 1;
-      min-width: 120px;
+      min-width: 150px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
 
-    button:hover {
-      background-color: var(--primary-dark);
+    button.btn-primary {
+      background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+      color: white;
+    }
+    button.btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(2, 132, 199, 0.35);
     }
 
-    button.secondary {
-      background-color: #64748b;
+    button.btn-shuffle {
+      background: linear-gradient(135deg, #fb7185 0%, #e11d48 100%);
+      color: white;
     }
-    button.secondary:hover {
-      background-color: #475569;
-    }
-
-    button.success {
-      background-color: #10b981;
-    }
-    button.success:hover {
-      background-color: #059669;
+    button.btn-shuffle:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(225, 29, 72, 0.35);
     }
 
-    /* 座位表預覽區域 */
+    button.btn-print {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: white;
+    }
+    button.btn-print:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(217, 119, 6, 0.35);
+    }
+
+    /* 座位展示主區域 */
     .seating-area {
-      background: var(--card-bg);
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      padding: 36px 28px;
+      border-radius: 24px;
+      border: 3px solid #ffffff;
+      box-shadow: var(--card-shadow);
       text-align: center;
     }
 
     .class-title-display {
-      font-size: 1.6rem;
-      font-weight: bold;
-      margin-bottom: 15px;
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--sky-blue);
+      margin-bottom: 20px;
+      letter-spacing: 2px;
+      text-shadow: 1px 1px 0 #38bdf8;
     }
 
+    /* 講台 / 黑板 (日系清新深翠綠黑板) */
     .podium {
-      width: 60%;
-      margin: 0 auto 25px auto;
-      padding: 10px;
-      background-color: #334155;
-      color: white;
-      font-weight: bold;
-      letter-spacing: 4px;
-      border-radius: 6px;
+      width: 65%;
+      margin: 0 auto 32px auto;
+      padding: 14px 20px;
+      background: linear-gradient(135deg, #064e3b 0%, #047857 100%);
+      color: #ecfdf5;
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: 6px;
+      border-radius: 12px;
+      border: 4px solid #a7f3d0;
+      box-shadow: 0 6px 16px rgba(4, 120, 87, 0.25);
+      position: relative;
     }
 
+    .podium::before {
+      content: "✦ 講 台 / 黑 板 ✦";
+    }
+
+    /* 格子 Grid */
     .grid-container {
       display: grid;
-      gap: 12px;
+      gap: 16px;
       justify-content: center;
-      margin-top: 20px;
+      margin-top: 10px;
     }
 
+    /* 座位卡片 */
     .seat-card {
-      border: 2px solid var(--border-color);
-      border-radius: 8px;
-      padding: 12px 8px;
-      min-height: 80px;
+      background: #ffffff;
+      border: 3px solid #e0f2fe;
+      border-radius: 16px;
+      padding: 14px 8px;
+      min-height: 95px;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      background-color: #ffffff;
       cursor: grab;
       user-select: none;
-      transition: all 0.2s;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
       position: relative;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+    }
+
+    .seat-card:hover {
+      border-color: var(--sky-vivid);
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 8px 20px rgba(56, 189, 248, 0.25);
     }
 
     .seat-card:active {
@@ -182,95 +293,159 @@
     }
 
     .seat-card.drag-over {
-      border-color: var(--primary-color);
-      background-color: #eff6ff;
-      transform: scale(1.03);
+      border-color: var(--sakura-pink);
+      background-color: var(--sakura-light);
+      transform: scale(1.06);
     }
 
     .seat-card.locked {
-      background-color: var(--locked-bg);
-      border-color: var(--locked-border);
+      background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+      border-color: var(--sun-gold);
     }
 
     .seat-card.empty {
-      background-color: var(--empty-bg);
+      background-color: #f8fafc;
+      border: 2px dashed #cbd5e1;
       color: #94a3b8;
-      border-style: dashed;
     }
 
     .seat-num {
       font-size: 0.75rem;
-      color: #64748b;
+      font-weight: 800;
+      color: #0284c7;
+      background: #e0f2fe;
+      padding: 2px 6px;
+      border-radius: 8px;
       position: absolute;
-      top: 4px;
+      top: 6px;
       left: 6px;
     }
 
     .lock-btn {
       position: absolute;
-      top: 4px;
+      top: 6px;
       right: 6px;
-      font-size: 0.75rem;
+      font-size: 0.85rem;
       cursor: pointer;
-      opacity: 0.5;
+      padding: 2px 4px;
+      border-radius: 6px;
+      transition: transform 0.2s;
     }
 
     .lock-btn:hover {
-      opacity: 1;
+      transform: scale(1.3);
     }
 
     .student-id {
-      font-size: 0.8rem;
-      color: #64748b;
+      font-size: 0.85rem;
+      color: #0284c7;
+      font-weight: 700;
     }
 
     .student-name {
-      font-size: 1.1rem;
-      font-weight: bold;
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--text-dark);
       margin-top: 4px;
     }
 
-    .tip-text {
-      margin-top: 15px;
-      font-size: 0.85rem;
-      color: #64748b;
+    .tip-banner {
+      margin-top: 24px;
+      padding: 12px 20px;
+      background: rgba(224, 242, 254, 0.8);
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #0369a1;
+      display: inline-block;
     }
 
-    /* 列印專用樣式 (@media print) */
+    /* 🖨️ A4 橫式列印專用樣式 (@media print) */
     @media print {
-      body {
-        background-color: white;
-        padding: 0;
+      @page {
+        size: A4 landscape; /* 強制設定為 A4 橫式 */
+        margin: 8mm;
       }
 
-      .control-panel, .tip-text, header h1, .no-print {
+      body {
+        background: none !important;
+        padding: 0 !important;
+        color: #000 !important;
+      }
+
+      body::before {
         display: none !important;
       }
 
+      .control-panel, header, .tip-banner, .no-print {
+        display: none !important;
+      }
+
+      .container {
+        max-width: 100% !important;
+        width: 100% !important;
+      }
+
       .seating-area {
-        box-shadow: none;
-        padding: 0;
-        width: 100%;
+        box-shadow: none !important;
+        border: none !important;
+        background: transparent !important;
+        padding: 0 !important;
+        width: 100% !important;
+      }
+
+      .class-title-display {
+        font-size: 2.2rem !important;
+        color: #000 !important;
+        text-shadow: none !important;
+        margin-bottom: 12px !important;
       }
 
       .podium {
-        background-color: #000;
-        color: #fff;
+        background: #1e293b !important;
+        color: #ffffff !important;
+        border: 2px solid #000 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        margin-bottom: 20px !important;
+        padding: 8px !important;
+      }
+
+      .grid-container {
+        gap: 10px !important;
+      }
+
+      .seat-card {
+        box-shadow: none !important;
+        border: 2px solid #000 !important;
+        background: #ffffff !important;
+        break-inside: avoid;
+        min-height: 80px !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
       }
 
-      .seat-card {
-        border: 1px solid #000 !important;
-        break-inside: avoid;
+      .seat-card.locked {
+        background-color: #fef3c7 !important;
+        border: 2px solid #d97706 !important;
       }
 
-      .seat-card.locked {
-        background-color: #fff !important;
+      .seat-num {
+        background: #e2e8f0 !important;
+        color: #000 !important;
+        border: 1px solid #94a3b8 !important;
       }
 
       .lock-btn {
-        display: none;
+        display: none !important;
+      }
+
+      .student-id {
+        color: #334155 !important;
+      }
+
+      .student-name {
+        color: #000000 !important;
       }
     }
   </style>
@@ -278,58 +453,86 @@
 <body>
 
   <div class="container">
+    <!-- 頁頭 Logo & 標題 -->
     <header>
-      <h1>🏫 班級智慧座位表產生器</h1>
+      <div class="logo-box">
+        <!-- 可愛的動漫風格雲朵貓貓 SVG Logo -->
+        <svg width="48" height="48" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 44C12 44 8 39 8 33C8 27.5 12 23 17 22.2C18.5 15 24.5 10 32 10C40 10 46.5 15.5 47.8 23C52.5 24 56 28 56 33C56 39 51.5 44 45 44H18Z" fill="#38BDF8"/>
+          <!-- 貓耳 -->
+          <path d="M22 18L15 8L26 13Z" fill="#FB7185"/>
+          <path d="M42 18L49 8L38 13Z" fill="#FB7185"/>
+          <!-- 臉部眼睛 & 腮紅 -->
+          <circle cx="25" cy="28" r="3" fill="#0F172A"/>
+          <circle cx="39" cy="28" r="3" fill="#0F172A"/>
+          <ellipse cx="20" cy="32" rx="3" ry="1.8" fill="#FDA4AF"/>
+          <ellipse cx="44" cy="32" rx="3" ry="1.8" fill="#FDA4AF"/>
+          <!-- 嘴巴 -->
+          <path d="M30 31Q32 34 34 31" stroke="#0F172A" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <!-- 閃亮星星 -->
+          <path d="M52 14L53.5 17.5L57 19L53.5 20.5L52 24L50.5 20.5L47 19L50.5 17.5Z" fill="#F59E0B"/>
+        </svg>
+      </div>
+      <div class="header-text">
+        <h1>Seatify ✦ 座位表產生器</h1>
+        <p>新海誠風格 ✕ 班級智慧亂數抽籤座位安排</p>
+      </div>
     </header>
 
+    <!-- 控制面板 -->
     <div class="control-panel">
       <div class="input-group">
-        <label for="classTitle">班級名稱 / 活動標題</label>
-        <input type="text" id="classTitle" value="115班 座位表" placeholder="例：115班 座位表">
+        <label for="classTitle">🌸 班級名稱 / 活動標題</label>
+        <input type="text" id="classTitle" value="115班 座位表" placeholder="例如：115班 座位表">
       </div>
 
       <div class="input-group">
-        <label for="sheetUrl">Google 試算表連結 (共享改為公開檢視)</label>
-        <input type="url" id="sheetUrl" placeholder="貼上 Google 試算表連結" value="https://docs.google.com/spreadsheets/d/11AzaC6tk9bDrRRtv31kS72lIPodPE_G_/edit?usp=sharing">
+        <label for="sheetUrl">🔗 Google 試算表連結 (公開檢視)</label>
+        <input type="url" id="sheetUrl" placeholder="貼上 Google 試算表網址" value="https://docs.google.com/spreadsheets/d/11AzaC6tk9bDrRRtv31kS72lIPodPE_G_/edit?usp=sharing">
       </div>
 
       <div class="input-group">
-        <label>座位排數與列數 (行 × 列)</label>
+        <label>📐 座位排列規格 (直排 × 橫列)</label>
         <div class="row-col-inputs">
-          <input type="number" id="rows" value="5" min="1" max="10" placeholder="行數 (直)">
-          <input type="number" id="cols" value="6" min="1" max="10" placeholder="列數 (橫)">
+          <input type="number" id="rows" value="5" min="1" max="12" placeholder="行數 (直)">
+          <input type="number" id="cols" value="6" min="1" max="12" placeholder="列數 (橫)">
         </div>
       </div>
 
       <div class="input-group">
-        <label for="manualInput">或直接貼上學生名單 (每行名字或「座號 姓名」)</label>
-        <textarea id="manualInput" rows="2" placeholder="例：&#10;1 陳大明&#10;2 林小美"></textarea>
+        <label for="manualInput">✍️ 或直接貼上學生名單 (每行名字或「座號 姓名」)</label>
+        <textarea id="manualInput" rows="2" placeholder="備用文字區：&#10;1 陳大明&#10;2 林小美"></textarea>
       </div>
 
       <div class="btn-group">
-        <button onclick="loadStudents()">1. 載入學生名單</button>
-        <button class="success" onclick="shuffleSeats()">2. 亂數抽籤排列</button>
-        <button class="secondary" onclick="window.print()">3. 🖨️ 列印座位表</button>
+        <button class="btn-primary" onclick="loadStudents()">📥 1. 載入學生名單</button>
+        <button class="btn-shuffle" onclick="shuffleSeats()">🎲 2. 亂數抽籤排列</button>
+        <button class="btn-print" onclick="window.print()">🖨️ 3. 列印座位表 (預設橫式)</button>
       </div>
     </div>
 
+    <!-- 座位展示區 -->
     <div class="seating-area">
       <div class="class-title-display" id="displayTitle">115班 座位表</div>
       
-      <div class="podium">黑 板 / 講 台</div>
+      <!-- 講台標示 -->
+      <div class="podium"></div>
 
+      <!-- 座位 Grid -->
       <div class="grid-container" id="gridContainer"></div>
 
-      <p class="tip-text">💡 提示：亂數排好後，可用滑鼠<b>拖曳座位</b>互相對調；點擊座位右上角的 📌 可以<b>鎖定座位</b>（亂數排列時將保持不變）。</p>
+      <div class="tip-banner">
+        ✨ <b>使用小撇步：</b>抽籤後可按住座位卡片<b>拖曳對調</b>；點擊右上角 📌 圖示可<b>固定/鎖定座位</b>（亂數抽籤時該位置將不受影響）。
+      </div>
     </div>
   </div>
 
   <script>
     let studentList = [];
-    let seatData = []; // 紀錄每個座位的狀態 { student: null/obj, locked: boolean }
+    let seatData = []; // 儲存每個座位的資訊 { student: null/obj, locked: boolean }
     let draggedIndex = null;
 
-    // 從 Google Sheet 網址提取 CSV 下載網址
+    // 將 Google Sheet 網址轉換為 CSV 匯出網址
     function getCsvUrl(url) {
       const match = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
       if (match && match[1]) {
@@ -338,7 +541,7 @@
       return url;
     }
 
-    // 載入名單
+    // 載入學生名單
     async function loadStudents() {
       const titleInput = document.getElementById('classTitle').value;
       document.getElementById('displayTitle').innerText = titleInput || "班級座位表";
@@ -349,14 +552,14 @@
       studentList = [];
 
       if (manualText) {
-        // 從手動輸入框讀取
+        // 優先從手動文字區讀取
         parseTextList(manualText);
       } else if (url) {
-        // 從 Google Sheet 讀取
+        // 從 Google 試算表線上讀取
         try {
           const csvUrl = getCsvUrl(url);
           const response = await fetch(csvUrl);
-          if (!response.ok) throw new Error("無法讀取 Google 試算表，請確認權限已設為「知道連結的人皆可檢視」");
+          if (!response.ok) throw new Error("無法讀取 Google 試算表，請確認已設定為「知道連結的人皆可檢視」！");
           const csvText = await response.text();
           parseCsvData(csvText);
         } catch (err) {
@@ -364,15 +567,15 @@
           return;
         }
       } else {
-        alert("請輸入 Google 試算表網址或在下方文字框貼上學生名單！");
+        alert("請輸入 Google 試算表連結或在文字框貼上學生名單！");
         return;
       }
 
       initGrid();
-      alert(`成功載入 ${studentList.length} 位學生名單！`);
+      alert(`✨ 成功載入 ${studentList.length} 位學生資料！`);
     }
 
-    // 解析文字名單
+    // 解析文字輸入
     function parseTextList(text) {
       const lines = text.split('\n');
       lines.forEach((line, index) => {
@@ -388,19 +591,18 @@
       });
     }
 
-    // 解析 CSV 名單
+    // 解析 CSV 資料
     function parseCsvData(csvText) {
       const lines = csvText.split('\n');
-      lines.forEach((line, index) => {
-        // 簡單清除非必要字元
+      lines.forEach((line) => {
         const cleanLine = line.replace(/"/g, '').trim();
         if (!cleanLine) return;
 
         const cols = cleanLine.split(',');
-        // 跳過表頭 (如包含 座號, 姓名 等字眼)
+        // 跳過標題列
         if (cols[0].includes('座號') || cols[0].includes('姓名') || cols[0].includes('Name')) return;
 
-        if (cols.length >= 2 && !isNaN(cols[0])) {
+        if (cols.length >= 2 && !isNaN(cols[0].trim())) {
           studentList.push({ id: cols[0].trim(), name: cols[1].trim() });
         } else if (cols.length >= 1 && cols[0].trim()) {
           studentList.push({ id: studentList.length + 1, name: cols[0].trim() });
@@ -415,9 +617,9 @@
       const totalSeats = rows * cols;
 
       const grid = document.getElementById('gridContainer');
-      grid.style.gridTemplateColumns = `repeat(${cols}, 120px)`;
+      grid.style.gridTemplateColumns = `repeat(${cols}, 130px)`;
 
-      // 保留原本鎖定的狀態，若沒有則創建新陣列
+      // 保留先前的鎖定狀態
       const newSeatData = [];
       for (let i = 0; i < totalSeats; i++) {
         const student = studentList[i] || null;
@@ -431,7 +633,7 @@
       renderGrid();
     }
 
-    // 渲染網格 UI
+    // 渲染 UI 網格
     function renderGrid() {
       const grid = document.getElementById('gridContainer');
       grid.innerHTML = '';
@@ -442,7 +644,7 @@
         card.draggable = true;
         card.dataset.index = index;
 
-        // 座號標示 (位置編號)
+        // 座號標示
         const seatNum = document.createElement('span');
         seatNum.className = 'seat-num';
         seatNum.innerText = index + 1;
@@ -451,7 +653,7 @@
         const lockBtn = document.createElement('span');
         lockBtn.className = 'lock-btn';
         lockBtn.innerHTML = seat.locked ? '🔒' : '📌';
-        lockBtn.title = seat.locked ? '點擊解鎖' : '點擊鎖定座位';
+        lockBtn.title = seat.locked ? '點擊解鎖座位' : '點擊鎖定座位';
         lockBtn.onclick = (e) => {
           e.stopPropagation();
           seatData[index].locked = !seatData[index].locked;
@@ -464,7 +666,7 @@
         if (seat.student) {
           const idElem = document.createElement('div');
           idElem.className = 'student-id';
-          idElem.innerText = `(${seat.student.id}號)`;
+          idElem.innerText = `${seat.student.id} 號`;
 
           const nameElem = document.createElement('div');
           nameElem.className = 'student-name';
@@ -475,11 +677,12 @@
         } else {
           const emptyElem = document.createElement('div');
           emptyElem.className = 'student-name';
+          emptyElem.style.color = '#cbd5e1';
           emptyElem.innerText = '空位';
           card.appendChild(emptyElem);
         }
 
-        // 拖曳事件綁定
+        // 綁定拖曳事件
         card.addEventListener('dragstart', handleDragStart);
         card.addEventListener('dragover', handleDragOver);
         card.addEventListener('dragleave', handleDragLeave);
@@ -489,14 +692,14 @@
       });
     }
 
-    // 亂數排列（洗牌演算法）
+    // 亂數洗牌演算法 (Fisher-Yates)
     function shuffleSeats() {
       if (seatData.length === 0) {
         alert("請先載入學生名單！");
         return;
       }
 
-      // 提取未鎖定座位上的學生名單
+      // 取得所有未鎖定位置上的學生
       let unlockedStudents = [];
       seatData.forEach(seat => {
         if (!seat.locked && seat.student) {
@@ -504,18 +707,13 @@
         }
       });
 
-      // 若未鎖定座位中有空的，也將剩餘學生補助進去
-      if (unlockedStudents.length === 0 && studentList.length > 0) {
-        unlockedStudents = [...studentList];
-      }
-
-      // Fisher-Yates 隨機洗牌
+      // 洗牌
       for (let i = unlockedStudents.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [unlockedStudents[i], unlockedStudents[j]] = [unlockedStudents[j], unlockedStudents[i]];
       }
 
-      // 填回未鎖定的座位
+      // 填回非鎖定座位
       let studentIdx = 0;
       seatData.forEach(seat => {
         if (!seat.locked) {
@@ -527,7 +725,7 @@
       renderGrid();
     }
 
-    // 拖曳對調邏輯
+    // 拖曳事件處理
     function handleDragStart(e) {
       draggedIndex = parseInt(this.dataset.index);
       e.dataTransfer.effectAllowed = 'move';
@@ -548,7 +746,7 @@
       const targetIndex = parseInt(this.dataset.index);
 
       if (draggedIndex !== null && draggedIndex !== targetIndex) {
-        // 對調兩個座位的學生
+        // 交換兩座位上的學生
         const temp = seatData[draggedIndex].student;
         seatData[draggedIndex].student = seatData[targetIndex].student;
         seatData[targetIndex].student = temp;
@@ -557,9 +755,15 @@
       }
     }
 
-    // 當行列改變時自動更新網格
+    // 監聽行列數變更
     document.getElementById('rows').addEventListener('change', initGrid);
     document.getElementById('cols').addEventListener('change', initGrid);
+
+    // 頁面初次載入預設構建
+    window.onload = () => {
+      initGrid();
+    };
   </script>
 </body>
 </html>
+```eofs
